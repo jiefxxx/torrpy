@@ -3,19 +3,38 @@ import pathlib
 import shutil
 from aiohttp import web
 import aiohttp
+import argparse
+
 from config import get_config
 import parser
-
 import torrent
 
 from torrent.exception import NoSpaceLeftException
 import torrent.manager
 
 
-static_path = "static"
+parser = argparse.ArgumentParser(
+                    prog='TorrPy',
+                    description='Torrent downloader')
+
+parser.add_argument('-c', '--config')
+parser.add_argument('-s', '--static')
 
 
-config = get_config("/playground/config.toml");
+static_path = None
+config = None
+
+
+args = parser.parse_args()
+
+if args.config is None:
+    config = get_config("/etc/torrpy/config.toml")
+else:
+    config = get_config(args.config)
+if args.static is None:
+    static_path = "/usr/share/torrpy/static/"
+else:
+    static_path = args.static
 
 def callback(path, data):
     new_name = None
