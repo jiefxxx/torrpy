@@ -821,6 +821,8 @@ function InitModalSearchTv(){
             search_tv_selected = null;
             $('#modal-search-tv-input').val("");
             search_tv_table.replaceData([]);
+            $('#modal-search-tv-episode-poster').attr("src","/rsc/poster_empty.jpg");
+            $('#modal-search-tv-overview').html("");
         },
     });
 
