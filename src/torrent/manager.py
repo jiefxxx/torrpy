@@ -187,9 +187,9 @@ class Manager:
                         if torrent is not None:
                             torrent.alert_save()
 
-                    elif type(a) == lt.file_completed_alert:
-                        print("file completed alert")
-                        self._execute_trigger(str(a.handle.info_hash()), a.index)
+                    # elif type(a) == lt.file_completed_alert:
+                    #     print("file completed alert")
+                    #     self._execute_trigger(str(a.handle.info_hash()), a.index)
 
                 if need_save:
                     self._save()
