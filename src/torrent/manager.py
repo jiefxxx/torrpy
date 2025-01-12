@@ -15,7 +15,7 @@ class Manager:
     def __init__(self, download_path, callback=None) -> None:
         self.ses = lt.session()
         settings = lt.default_settings()
-        settings["alert_mask"] = settings["alert_mask"] | lt.alert.category_t.status_notification
+        settings["alert_mask"] = settings["alert_mask"] | lt.alert.category_t.status_notification | lt.alert.category_t.progress_notification
         settings["listen_interfaces"] = "0.0.0.0:5550,[::]:5550"
         settings["upload_rate_limit"] = 0
         settings["download_rate_limit"] = 0

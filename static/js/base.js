@@ -518,7 +518,7 @@ function InitModalEdit(){
                     return "pending"; 
                 }
                 else if (cell.getValue().state == 2){
-                    return "created"; 
+                    return "working..."; 
                 }
                 else if (cell.getValue().state == 3){
                     return "finished"; 
