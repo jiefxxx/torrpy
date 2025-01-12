@@ -131,6 +131,11 @@ class Manager:
         if t.completed():                    #todo files completed instead of torrent completed
             self._execute_trigger(hash, data["id"])
     
+    def reset_trigger(self, hash, id):
+        t = self.get(hash)
+        t.reset_trigger(id)
+        t.alert_save()
+    
     def set_position(self, hash, position):
         self.get(hash).set_position(position)
     

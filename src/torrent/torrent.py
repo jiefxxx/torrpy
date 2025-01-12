@@ -47,15 +47,18 @@ class Triggers:
     def add(self, data):
         self.check(data)
 
-        trigger = self.get(data["id"])
-        if trigger is not None:
-            self.triggers.remove(trigger)
+        self.remove(data["id"])
         
         self.triggers.append({
             "id": data["id"],
             "data": data,
             "state": 0,
         })
+    
+    def remove(self, id):
+        trigger = self.get(id)
+        if trigger is not None:
+            self.triggers.remove(trigger)
     
     def update(self, id, state):
         trigger = self.get(id)
@@ -179,6 +182,9 @@ class Torrent:
     
     def set_trigger(self, data):
         self.triggers.add(data)
+    
+    def reset_trigger(self, id):
+        self.triggers.remove(id)
     
     def update_trigger(self, id, state):
        self.triggers.update(id, state)

@@ -421,6 +421,21 @@ function InitModalEdit(){
                 }
             },
             {
+                label:"Delete trigger",
+                action:function(e, row){
+                    var selectedData;
+                    if (row.isSelected()){
+                        selectedData = row.getTable().getSelectedData();
+                    }
+                    else{
+                        selectedData = [row.getData()];
+                    }
+                    console.log()
+                    delete_triggers(selectedData);
+
+                }
+            },
+            {
                 label:"Tv",
                 action:function(e, row){
                     var selectedData;
@@ -645,6 +660,22 @@ function set_priority_files_torrent(dataSet){
     });
     axios.put("/torrent?hash="+edit_torrent_data.hash, json).catch(function (error) {
         open_alert_error("edit priority error", error);
+    });
+}
+
+function delete_triggers(dataSet){
+    if (!Array.isArray(dataSet)){
+        dataSet = [dataSet];
+    }
+
+    var json = {reset_triggers: []};
+    dataSet.forEach(function(data){
+        json.reset_triggers.push(data.id);
+    });
+    axios.put("/torrent?hash="+edit_torrent_data.hash, json).then(function(response){
+        refresh_modal_edit_torrent();
+    }).catch(function (error) {
+        open_alert_error("edit rest trigger error", error);
     });
 }
 

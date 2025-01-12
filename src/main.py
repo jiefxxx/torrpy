@@ -127,6 +127,10 @@ async def put_torrent(request):
                 )
             manager.set_trigger(hash, trigger)
     
+    if "reset_triggers" in data:
+        for id in data["reset_triggers"]:
+            manager.reset_trigger(hash, id)
+    
     return web.json_response({"message": "ok"})
 
 async def post_torrent(request):
