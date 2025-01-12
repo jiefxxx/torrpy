@@ -44,8 +44,8 @@ class Manager:
             h = self.ses.add_torrent({'resume_data': base64.b64decode(info["data"]),
                                       'save_path': info["save_path"]})
             if h.is_valid():
-                torrent = Torrent(h, data=info['data'], triggers=info["triggers"])
-                self.torrents.append(torrent)
+                t = Torrent(h, data=info['data'], triggers=info["triggers"])
+                self.torrents.append(t)
             else:
                 print(f"error add torrent for fast_resume info {info}")
         
@@ -63,58 +63,61 @@ class Manager:
 
 
     def get(self, hash):
-        for torrent in self.torrents:
-            if hash == torrent.hash:
-                return torrent
+        for t in self.torrents:
+            if hash == t.hash:
+                return t
     
     def add_torrent(self, path):
+        print(path)
         info = lt.torrent_info(path)
-        torrent = None
+        print(info)
+        t = None
         try:
             h = self.ses.add_torrent({'ti': info,
                                       'save_path': self.download_path,
                                       'storage_mode': lt.storage_mode_t(2)})
 
             if h.is_valid():
-                torrent = Torrent(h)
-                self.torrents.append(torrent)
-                torrent.alert_save()
+                t = Torrent(h)
+                print(t.triggers)
+                self.torrents.append(t)
+                t.alert_save()
 
         except RuntimeError:
-            torrent = self.get(str(info.info_hash()))
+            t = self.get(str(info.info_hash()))
         
         finally:
-            return torrent.full_info()
+            return t.full_info()
         
     def info(self, hash=None):
         if hash is not None:
-            torrent = self.get(hash)
-            if torrent is not None:
-                return torrent.full_info()
+            t = self.get(hash)
+            if t is not None:
+                return t.full_info()
             else:
                 return None
         info = {
             "torrents":[],
         }
-        for torrent in self.torrents:
-            info["torrents"].append(torrent.info())
+        for t in self.torrents:
+            info["torrents"].append(t.info())
         return info
     
     def pause(self, hash=None, pause=True):
         if hash is not None:
             self.get(hash).pause(pause)
         else:
-            for torrent in self.torrents:
-                torrent.pause(pause)
+            for t in self.torrents:
+                t.pause(pause)
     
     def remove(self, hash, files=True):
-        torrent = self.get(hash)
-        self.torrents.remove(torrent)
+        t = self.get(hash)
+        self.torrents.remove(t)
 
-        self.ses.remove_torrent(torrent.handle)
+        self.ses.remove_torrent(t.handle)
 
         if files:
-            torrent.delete_files()
+            t.delete_files()
 
         if len(self.torrents)> 0:
             self.alert_save()
@@ -122,10 +125,10 @@ class Manager:
             self._save()
     
     def set_trigger(self, hash, data):
-        torrent = self.get(hash)
-        torrent.set_trigger(data)
-        torrent.alert_save()
-        if torrent.completed():                    #todo files completed instead of torrent completed
+        t = self.get(hash)
+        t.set_trigger(data)
+        t.alert_save()
+        if t.completed():                    #todo files completed instead of torrent completed
             self._execute_trigger(hash, data["id"])
     
     def set_position(self, hash, position):
@@ -138,37 +141,37 @@ class Manager:
         if hash is not None:
             self.get(hash).alert_save()
         else:
-            for torrent in self.torrents:
-                torrent.alert_save()
+            for t in self.torrents:
+                t.alert_save()
 
     def _save(self):
         fast_resume = []
-        for torrent in self.torrents:
-            fast_resume.append(torrent.fast_resume())
+        for t in self.torrents:
+            fast_resume.append(t.fast_resume())
         
         write_fast_resume_json(fast_resume, self.fast_resume_path)
     
     def _execute_triggers(self, hash=None):
         if hash:
-            torrent = self.get(hash)
-            if torrent is not None and torrent.completed():
-                for id in torrent.trigger_ids():
+            t = self.get(hash)
+            if t is not None and t.completed():
+                for id in t.trigger_ids():
                         self._execute_trigger(hash, id)
         else:
-            for torrent in self.torrents:
-                if torrent is not None and torrent.completed():
-                    for id in torrent.trigger_ids():
-                        self._execute_trigger(torrent.hash, id)
+            for t in self.torrents:
+                if t is not None and t.completed():
+                    for id in t.trigger_ids():
+                        self._execute_trigger(t.hash, id)
     
     def _execute_trigger(self, hash, id):
-        torrent = self.get(hash)
-        trigger = torrent.trigger(id)
+        t = self.get(hash)
+        trigger = t.trigger(id)
         if trigger is not None and trigger["state"]==0:
             if self.callback is None:
-                 torrent.update_trigger(id, -1)
+                 t.update_trigger(id, -1)
                  return
-            torrent.update_trigger(id, 1)
-            self.callback_queue.put((torrent.hash, id, trigger["data"]))
+            t.update_trigger(id, 1)
+            self.callback_queue.put((t.hash, id, trigger["data"]))
 
     def _alert_handler(self):
         while True:
@@ -183,13 +186,12 @@ class Manager:
                     elif type(a) == lt.torrent_finished_alert:
                         hash = str(a.handle.info_hash())
                         self._execute_triggers(hash)
-                        torrent = self.get(hash)
-                        if torrent is not None:
-                            torrent.alert_save()
+                        t = self.get(hash)
+                        if t is not None:
+                            t.alert_save()
 
-                    # elif type(a) == lt.file_completed_alert:
-                    #     print("file completed alert")
-                    #     self._execute_trigger(str(a.handle.info_hash()), a.index)
+                    elif type(a) == lt.file_completed_alert:
+                        self._execute_trigger(str(a.handle.info_hash()), a.index)
 
                 if need_save:
                     self._save()
@@ -209,23 +211,23 @@ class Manager:
             
             hash, id, data = element
 
-            torrent = self.get(hash)
-            path = torrent.file_path(id)
-            if torrent is not None:
-                torrent.update_trigger(id, 2)
+            t = self.get(hash)
+            if t is not None:
+                path = t.file_path(id)
+                t.update_trigger(id, 2)
                 try:
                     self.callback(path, data)
-                    torrent.update_trigger(id, 3)
+                    t.update_trigger(id, 3)
                 except NoSpaceLeftException:
-                    torrent.update_trigger(id, -2)
+                    t.update_trigger(id, -2)
                 except TriggerDataException as e:
-                    torrent.update_trigger(id, -3)
+                    t.update_trigger(id, -3)
                     print(e)
                 except Exception as e:
-                    torrent.update_trigger(id, -4)
+                    t.update_trigger(id, -4)
                     print(e)
                 finally:
-                    torrent.alert_save()
+                    t.alert_save()
 
 
 def load_fast_resume_json(path):

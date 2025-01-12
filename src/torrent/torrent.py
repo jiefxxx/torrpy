@@ -7,7 +7,10 @@ import libtorrent as lt
 from torrent.exception import TriggerDataException
 
 class Triggers:
-    def __init__(self, file_count, old_triggers=[]):
+    def __init__(self, file_count, old_triggers=None):
+        if old_triggers is None:
+            old_triggers = []
+
         self.triggers = old_triggers
         self.file_count = file_count
         for trigger in self.triggers:
@@ -89,11 +92,13 @@ class Triggers:
 
     
 class Torrent:
-    def __init__(self, handle, data=None, triggers=[]) -> None:
+    def __init__(self, handle, data=None, triggers=None) -> None:
         self.handle = handle
         self.name = handle.name()
         self.path =  os.path.join(handle.save_path(), handle.name())
         self.hash = str(handle.info_hash())
+        if triggers is None:
+            triggers = []
         self.triggers = Triggers(self.handle.get_torrent_info().files().num_files(), triggers)
         self.data = data
     
