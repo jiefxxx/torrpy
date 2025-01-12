@@ -880,6 +880,16 @@ function InitModalSearchTv(){
     $("#modal-search-tv-episode-force").click(function (){
         send_tv_trigger(search_tv_episode_table.getData());
     });
+
+    $("#modal-search-tv-season-set").click(function (){
+        var season = $('#modal-search-tv-season-input').val();
+        var data = search_tv_episode_table.getData();
+        for (let i = 0; i < data.length; i++){
+            data[i].season = parseInt(season);
+        }
+        search_tv_episode_table.updateData(data);
+
+    });
 }
 
 function open_modal_search_tv(infos){
