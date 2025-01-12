@@ -68,9 +68,7 @@ class Manager:
                 return t
     
     def add_torrent(self, path):
-        print(path)
         info = lt.torrent_info(path)
-        print(info)
         t = None
         try:
             h = self.ses.add_torrent({'ti': info,
@@ -79,7 +77,6 @@ class Manager:
 
             if h.is_valid():
                 t = Torrent(h)
-                print(t.triggers)
                 self.torrents.append(t)
                 t.alert_save()
 
