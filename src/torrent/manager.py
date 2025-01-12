@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import json
 import os
@@ -66,6 +67,22 @@ class Manager:
         for t in self.torrents:
             if hash == t.hash:
                 return t
+    
+    async def add_magnet(self, magnet):
+        try:
+            h = lt.add_magnet_uri(self.ses, magnet, {'save_path': self.download_path,
+                                                     'storage_mode': lt.storage_mode_t(2)})
+           
+            while (not h.has_metadata()): await asyncio.sleep(1)
+
+            if h.is_valid():
+                t = Torrent(h)
+                self.torrents.append(t)
+                t.alert_save()
+                return t.full_info()
+
+        except RuntimeError:
+            return None
     
     def add_torrent(self, path):
         info = lt.torrent_info(path)
