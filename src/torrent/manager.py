@@ -188,6 +188,7 @@ class Manager:
                             torrent.alert_save()
 
                     elif type(a) == lt.file_completed_alert:
+                        print("file completed alert")
                         self._execute_trigger(str(a.handle.info_hash()), a.index)
 
                 if need_save:
