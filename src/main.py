@@ -13,19 +13,19 @@ from torrent.exception import NoSpaceLeftException
 import torrent.manager
 
 
-parser = argparse.ArgumentParser(
+arg_parser = argparse.ArgumentParser(
                     prog='TorrPy',
                     description='Torrent downloader')
 
-parser.add_argument('-c', '--config')
-parser.add_argument('-s', '--static')
+arg_parser.add_argument('-c', '--config')
+arg_parser.add_argument('-s', '--static')
 
 
 static_path = None
 config = None
 
 
-args = parser.parse_args()
+args = arg_parser.parse_args()
 
 if args.config is None:
     config = get_config("/etc/torrpy/config.toml")
