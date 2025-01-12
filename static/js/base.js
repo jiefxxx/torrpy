@@ -926,6 +926,9 @@ function open_modal_search_tv(infos){
                 $('#modal-search-tv-episode').iziModal('open');
             });
         }
+        else{
+            $('#modal-search-tv-episode').iziModal('open');
+        }
 
     })
     .catch(function (error) {
