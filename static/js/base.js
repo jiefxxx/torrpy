@@ -335,12 +335,13 @@ function InitModalUpload(){
 
     $( "#modal-upload-validate" ).on( "click", function() {
         var data = null;
-        if($('#modal-upload-magnet').val != null){
-            data = {uri: $('#modal-upload-magnet').val()}
-        }
-        else if($('#modal-upload-file').val != null){
+        
+        if($('#modal-upload-file').val()){
             data= new FormData();
             data.append('torrent', $('#modal-upload-file').prop('files')[0]);
+        }
+        else if($('#modal-upload-magnet').val()){
+            data = {uri: $('#modal-upload-magnet').val()}
         }
         else{
             return

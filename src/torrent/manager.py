@@ -84,8 +84,8 @@ class Manager:
     
     def add_torrent(self, path):
         info = lt.torrent_info(path)
-        t = None
-        try:
+        t = self.get(str(info.info_hash()))
+        if t is None:
             h = self.ses.add_torrent({'ti': info,
                                       'save_path': self.download_path,
                                       'storage_mode': lt.storage_mode_t(2)})
@@ -93,12 +93,8 @@ class Manager:
             if h.is_valid():
                 t = Torrent(h)
                 self.torrents.append(t)
-                t.alert_save()
-
-        except RuntimeError:
-            t = self.get(str(info.info_hash()))
         
-        finally:
+        if t is not None:
             return t.full_info()
         
     def info(self, hash=None):
