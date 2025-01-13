@@ -334,33 +334,40 @@ function InitModalUpload(){
     });
 
     $( "#modal-upload-validate" ).on( "click", function() {
-        if($('#modal-upload-file').val != null){
-            const form = new FormData();
-            form.append('torrent', $('#modal-upload-file').prop('files')[0]);
-            axios.post('torrent', form)
+        var data = null;
+        if($('#modal-upload-magnet').val != null){
+            data = {uri: $('#modal-upload-magnet').val()}
+        }
+        else if($('#modal-upload-file').val != null){
+            data= new FormData();
+            data.append('torrent', $('#modal-upload-file').prop('files')[0]);
+        }
+        else{
+            return
+        }
+        axios.post('torrent', data)
+        .then(function (response) {
+            $('#modal-upload').iziModal('close', {
+                transition: 'bounceOutDown'
+            });
+            axios.get("/torrent")
             .then(function (response) {
-                $('#modal-upload').iziModal('close', {
-                    transition: 'bounceOutDown'
-                });
-                axios.get("/torrent")
-                .then(function (response) {
-                    if (response.data.torrents.length > 0){
-                        torrent_table.replaceData(response.data.torrents);
-                    }
-                    else{
-                        console.log(response.data)
-                    }
-                    
-                })
-                .catch(function (error) {
-                    open_alert_error("refresh torrent", error);
-                })
-                new_modal_edit_torrent(response.data);
+                if (response.data.torrents.length > 0){
+                    torrent_table.replaceData(response.data.torrents);
+                }
+                else{
+                    console.log(response.data)
+                }
+                
             })
             .catch(function (error) {
-                open_alert_error("upload failed", error.message);
+                open_alert_error("refresh torrent", error);
             })
-        }
+            new_modal_edit_torrent(response.data);
+        })
+        .catch(function (error) {
+            open_alert_error("upload failed", error.message);
+        });
     });
 }
 

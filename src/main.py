@@ -134,19 +134,22 @@ async def put_torrent(request):
     return web.json_response({"message": "ok"})
 
 async def post_torrent(request):
-    reader = await request.multipart()
+    if request.content_type == "application/json":
+        magnet = await request.json()
+        return web.json_response(await manager.add_magnet(magnet["uri"]))
+    else:
+        reader = await request.multipart()
+        field = await reader.next()
+        assert field.name == 'torrent'
+        path = os.path.join(config["download_path"],".torrents", field.filename)
+        with open(path, 'wb') as f:
+            while True:
+                chunk = await field.read_chunk()
+                if not chunk:
+                    break
+                f.write(chunk)
 
-    field = await reader.next()
-    assert field.name == 'torrent'
-    path = os.path.join(config["download_path"],".torrents", field.filename)
-    with open(path, 'wb') as f:
-        while True:
-            chunk = await field.read_chunk()
-            if not chunk:
-                break
-            f.write(chunk)
-
-    return web.json_response(manager.add_torrent(path))
+        return web.json_response(manager.add_torrent(path))
 
 async def delete_torrent(request):
     hash=request.rel_url.query.get('hash', None)
