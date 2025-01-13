@@ -518,48 +518,19 @@ function InitModalEdit(){
                 if (cell.getValue() == null){
                     return this.emptyToSpace("");
                 }
-                const data = cell.getValue().data;
+                const trigger = cell.getValue();
+                const data = trigger.data;
                 if (data.type == "movie"){
                     var info = '<a href="https://www.themoviedb.org/movie/'+data.tmdb_id+'" target="_blank">'+data.title+' - '+data.year+'</a>'
+                    info = info+" - "+trigger_state_to_string(trigger);
                     return this.emptyToSpace(info);
                 }
                 else if (data.type == "tv"){
                     var info = '<a href="https://www.themoviedb.org/tv/'+data.tmdb_id+'" target="_blank">'+data.name+' S'+padZero(data.season)+'E'+padZero(data.episode)+'</a>'
+                    info = info+" - "+trigger_state_to_string(trigger);
                     return this.emptyToSpace(info);
                 }
                 return this.emptyToSpace("None or Unknown");
-            }},
-            {title:"Triggered", field:"trigger", responsive:0, formatter:function(cell, formatterParams, onRendered){
-                if (cell.getValue() == null){
-                    return "";
-                }
-                if (cell.getValue().state == 0){
-                    return "created"; 
-                }
-                else if (cell.getValue().state == 1){
-                    return "pending"; 
-                }
-                else if (cell.getValue().state == 2){
-                    return "working..."; 
-                }
-                else if (cell.getValue().state == 3){
-                    return "finished"; 
-                }
-                else if (cell.getValue().state == -1){
-                    return "error(no callback)"; 
-                }
-                else if (cell.getValue().state == -2){
-                    return "error(no space left)"; 
-                }
-                else if (cell.getValue().state == -3){
-                    return "error(trigger data)"; 
-                }
-                else if (cell.getValue().state == -4){
-                    return "error(unknown)"; 
-                }
-                else{
-                    return "error("+cell.getValue().state+")"
-                }
             }},
         ],
     });
@@ -654,6 +625,36 @@ function update_modal_edit_torrent(){
     }
     else{
         $("#modal-edit-pause").text("Pause");
+    }
+}
+
+function trigger_state_to_string(trigger){
+    if (trigger.state == 0){
+        return "created"; 
+    }
+    else if (trigger.state == 1){
+        return "pending"; 
+    }
+    else if (trigger.state == 2){
+        return "working..."; 
+    }
+    else if (trigger.state == 3){
+        return "finished"; 
+    }
+    else if (trigger.state == -1){
+        return "error(no callback)"; 
+    }
+    else if (trigger.state == -2){
+        return "error(no space left)"; 
+    }
+    else if (trigger.state == -3){
+        return "error(trigger data)"; 
+    }
+    else if (trigger.state == -4){
+        return "error(unknown)"; 
+    }
+    else{
+        return "error("+trigger.state+")"
     }
 }
 
