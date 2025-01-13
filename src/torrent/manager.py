@@ -188,33 +188,37 @@ class Manager:
 
     def _alert_handler(self):
         while True:
-            if self.ses.wait_for_alert(1000):
-                need_save = False
-                for a in self.ses.pop_alerts():
-                    #print(f"libtorrent::{a}")
-                    if type(a) == lt.save_resume_data_alert:
-                        self.get(str(a.handle.info_hash())).set_data(a.resume_data)
-                        need_save = True
+            try:
+                if self.ses.wait_for_alert(1000):
+                    need_save = False
+                    for a in self.ses.pop_alerts():
+                        #print(f"libtorrent::{a}")
+                        if type(a) == lt.save_resume_data_alert:
+                            self.get(str(a.handle.info_hash())).set_data(a.resume_data)
+                            need_save = True
 
-                    elif type(a) == lt.torrent_finished_alert:
-                        hash = str(a.handle.info_hash())
-                        self._execute_triggers(hash)
-                        t = self.get(hash)
-                        if t is not None:
-                            t.alert_save()
+                        elif type(a) == lt.torrent_finished_alert:
+                            hash = str(a.handle.info_hash())
+                            self._execute_triggers(hash)
+                            t = self.get(hash)
+                            if t is not None:
+                                t.alert_save()
 
-                    elif type(a) == lt.file_completed_alert:
-                        self._execute_trigger(str(a.handle.info_hash()), a.index)
+                        elif type(a) == lt.file_completed_alert:
+                            self._execute_trigger(str(a.handle.info_hash()), a.index)
 
-                if need_save:
-                    self._save()
+                    if need_save:
+                        self._save()
 
-            elif not self.run:
-                return
-            
-            elif time.time()>self.next:
-                self.next += 60*60
-                self.alert_save()
+                elif not self.run:
+                    return
+                
+                elif time.time()>self.next:
+                    self.next += 60*60
+                    self.alert_save()
+            except Exception as e:
+                print("exception in alert thread")
+                print(e)
     
     def _callback_handler(self):
         while True:
