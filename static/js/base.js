@@ -216,7 +216,7 @@ function InitTorrentTable(){
             }},
             {title:"State", field:"state", responsive:3},
             {title:"Trigger", field:"trigger", responsive:1},
-            {title:"Name", field:"name", responsive:0}
+            {title:"Name", field:"name", responsive:0, maxWidth:600}
         ],
         rowFormatter:function(row){
             // var video = row.getData();
@@ -498,7 +498,7 @@ function InitModalEdit(){
             }, cellEdited:function(cell){
                 set_priority_files_torrent(cell.getRow().getData());
             }},
-            {title:"Path", field:"path",  responsive:0, formatter:function(cell, formatterParams, onRendered){
+            {title:"Path", field:"path", maxWidth:500, responsive:0, formatter:function(cell, formatterParams, onRendered){
                 var path = cell.getValue();
                 return path.substring(path.lastIndexOf('/')+1);
             }, tooltip:true},
