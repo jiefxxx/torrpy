@@ -725,7 +725,7 @@ function InitModalSearchMovie(){
         ],
     });
   
-    search_movie_table.on("rowDblClick", function(e, row){
+    search_movie_table.on("rowClick", function(e, row){
         movie = row.getData();
         if (edit_torrent_movie != null){
             axios.put("/torrent?hash="+edit_torrent_data.hash, {
@@ -770,6 +770,14 @@ function InitModalSearchMovie(){
         .catch(function (error) {
             open_alert_error("edit position error", error);
         });
+    });
+
+    $('#modal-search-movie-input').keypress(function (e) {
+        var key = e.which;
+        if(key == 13){
+            $('#modal-search-movie-validate').click();
+            return false;  
+        }
     });
 }
 
@@ -825,7 +833,7 @@ function InitModalSearchTv(){
         ],
     });
   
-    search_tv_table.on("rowDblClick", function(e, row){
+    search_tv_table.on("rowClick", function(e, row){
         search_tv_selected = row.getData();
         $('#modal-search-tv-episode-poster').attr("src","https://image.tmdb.org/t/p/w154"+search_tv_selected.poster_path);
         $('#modal-search-tv-overview').html(search_tv_selected.overview);
@@ -850,6 +858,14 @@ function InitModalSearchTv(){
             open_alert_error("edit position error", error);
         });
     });
+
+    $('#modal-search-tv-input').keypress(function (e) {
+        var key = e.which;
+        if(key == 13){
+            $('#modal-search-tv-validate').click();
+            return false;  
+        }
+    });  
 
     $('#modal-search-tv-episode').iziModal({
         title: 'Recherche tmdb Tv Episode',
@@ -876,7 +892,7 @@ function InitModalSearchTv(){
             {
                 label:"Delete",
                 action:function(e, row){
-                    table.deleteRow(row.getIndex());
+                    search_tv_episode_table.deleteRow(row.getData().id);
                 }
             },
         ],

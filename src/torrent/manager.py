@@ -79,7 +79,7 @@ class Manager:
             if t is None:
                 t = Torrent(h)
                 self.torrents.append(t)
-            t.alert_save()
+                t.alert_save()
             return t.full_info()
     
     def add_torrent(self, path):
@@ -93,6 +93,7 @@ class Manager:
             if h.is_valid():
                 t = Torrent(h)
                 self.torrents.append(t)
+                t.alert_save()
         
         if t is not None:
             return t.full_info()
@@ -198,7 +199,7 @@ class Manager:
                             t = self.get(hash)
                             if t is not None:
                                 t.set_data(a.resume_data)
-                                need_save = True
+                            need_save = True
 
                         elif type(a) == lt.torrent_finished_alert:
                             hash = str(a.handle.info_hash())
@@ -215,6 +216,7 @@ class Manager:
                         self._save()
 
                 elif not self.run:
+                    print("stop run")
                     return
                 
                 elif time.time()>self.next:
