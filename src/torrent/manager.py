@@ -194,6 +194,7 @@ class Manager:
                     for a in self.ses.pop_alerts():
                         #print(f"libtorrent::{a}")
                         if type(a) == lt.save_resume_data_alert:
+                            hash = str(a.handle.info_hash())
                             t = self.get(hash)
                             if t is not None:
                                 t.set_data(a.resume_data)
@@ -207,7 +208,8 @@ class Manager:
                                 t.alert_save()
 
                         elif type(a) == lt.file_completed_alert:
-                            self._execute_trigger(str(a.handle.info_hash()), a.index)
+                            hash = str(a.handle.info_hash())
+                            self._execute_trigger(hash, a.index)
 
                     if need_save:
                         self._save()

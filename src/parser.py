@@ -19,18 +19,21 @@ def tv_name(name):
         return ret
     match = tv_pattern2.match(name)
     if match is not None:
-        ret["name"] = match.group(3).replace(".", " ").replace("-", " ").replace("_", " ")
+        if match.group(3) is not None:
+            ret["name"] = name.replace(".", " ").replace("-", " ").replace("_", " ")
         ret["season"] = int(match.group(6))
         ret["episode"] = int(match.group(7))
         return ret
     match = tv_pattern3.match(name)
     if match is not None:
-        ret["name"] = match.group(3).replace(".", " ").replace("-", " ").replace("_", " ")
+        if match.group(3) is not None:
+            ret["name"] = name.replace(".", " ").replace("-", " ").replace("_", " ")
         ret["episode"] = int(match.group(6))
         return ret
     match = tv_pattern4.match(name)
     if match is not None:
-        ret["name"] = match.group(3).replace(".", " ")
+        if match.group(3) is not None:
+            ret["name"] = name.replace(".", " ").replace("-", " ").replace("_", " ")
         ret["episode"] = int(match.group(5))
         return ret
     return ret
