@@ -194,8 +194,10 @@ class Manager:
                     for a in self.ses.pop_alerts():
                         #print(f"libtorrent::{a}")
                         if type(a) == lt.save_resume_data_alert:
-                            self.get(str(a.handle.info_hash())).set_data(a.resume_data)
-                            need_save = True
+                            t = self.get(hash)
+                            if t is not None:
+                                t.set_data(a.resume_data)
+                                need_save = True
 
                         elif type(a) == lt.torrent_finished_alert:
                             hash = str(a.handle.info_hash())

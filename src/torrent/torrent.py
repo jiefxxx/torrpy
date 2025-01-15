@@ -97,9 +97,10 @@ class Triggers:
 class Torrent:
     def __init__(self, handle, data=None, triggers=None) -> None:
         self.handle = handle
-        self.name = handle.name()
-        self.path =  os.path.join(handle.save_path(), handle.name())
-        self.hash = str(handle.info_hash())
+        self.hash = str(self.handle.info_hash())
+        self.name = self.handle.name()
+        self.path =  os.path.join(self.handle.save_path(), handle.name())
+        self.parts_path = os.path.join(self.handle.save_path(),"."+self.hash+".parts")
         if triggers is None:
             triggers = []
         self.triggers = Triggers(self.handle.get_torrent_info().files().num_files(), triggers)
@@ -206,9 +207,8 @@ class Torrent:
             self.handle.queue_position_down()
     
     def delete_files(self):
-        parts_path = os.path.join(self.handle.save_path(),"."+self.hash+".parts");
-        if os.path.exists(parts_path):
-            os.remove(parts_path)
+        if os.path.exists(self.parts_path):
+            os.remove(self.parts_path)
         if os.path.isfile(self.path):
             os.remove(self.path)
         elif os.path.isdir(self.path):
