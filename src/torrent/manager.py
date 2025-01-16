@@ -18,8 +18,6 @@ class Manager:
         self.settings = lt.default_settings()
         self.settings["alert_mask"] = self.settings["alert_mask"] | lt.alert.category_t.status_notification | lt.alert.category_t.progress_notification
         self.settings["listen_interfaces"] = "0.0.0.0:5550,[::]:5550"
-        self.settings["upload_rate_limit"] = 0
-        self.settings["download_rate_limit"] = 1000000
 
         self.ses.apply_settings(self.settings)
 
