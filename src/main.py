@@ -36,6 +36,35 @@ if args.static is None:
 else:
     static_path = args.static
 
+def format_title(title):
+    title = title.lower()
+    title = title.replace("*", "")
+    title = title.replace("/", ".")
+    title = title.replace(" ", ".")
+    title = title.replace(":", ".")
+    title = title.replace("?", ".")
+    title = title.replace("|", ".")
+    title = title.replace("/", ".")
+    title = title.replace('"', ".")
+    title = title.replace("\\", ".")
+    title = title.replace("<", ".")
+    title = title.replace(">", ".")
+    title = ".".join(title.split("."))
+    return title
+
+def format_movie(title, year, tmdb_id, ext):
+    return f"{format_title(title)}.({year}).[tmdbid-{tmdb_id}]{ext}"
+
+def format_tv(name, year, season, episode, tmdb_id, ext):
+    season = str(season).zfill(2)
+    episode = str(episode).zfill(2)
+
+    tv_path = f"{format_title(name)}.({year}).[tmdbid-{tmdb_id}]"
+    season_path = f"Season {season}"
+    episode_path = f"{format_title(name)}.S{season}E{episode}{ext}"
+
+    return os.path.join(tv_path, season_path, episode_path)
+
 def callback(path, data):
     new_name = None
     folder = None
@@ -44,25 +73,11 @@ def callback(path, data):
     size = os.stat(path).st_size
 
     if data["type"] == "movie":
-        title = data["title"].replace(" ",".").replace("*","").lower()
-        year = data["year"]
-        tmdb_id = data["tmdb_id"]
-
-        new_name = f"{title}.({year}).[tmdbid-{tmdb_id}]{ext}"
+        new_name = format_movie(data["title"],data["year"],data["tmdb_id"],ext)
         folder = get_folder_by_size(size, config["movie_folders"])
 
     elif data["type"] == "tv":
-        name = data["name"].replace(" ",".").replace("*","").lower()
-        tmdb_id = data["tmdb_id"]
-        year = data["year"]
-        season = str(data["season"]).zfill(2)
-        episode = str(data["episode"]).zfill(2)
-
-        tv_path = f"{name}.({year}).[tmdbid-{tmdb_id}]"
-        season_path = f"Season {season}"
-        episode_path = f"{name}.S{season}E{episode}{ext}"
-
-        new_name = os.path.join(tv_path, season_path, episode_path)
+        new_name = format_tv(data["name"],data["year"],data["season"],data["episode"],data["tmdb_id"],ext)
         folder = get_folder_by_size(size, config["tv_folders"])
 
     else:
