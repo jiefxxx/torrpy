@@ -15,13 +15,13 @@ from torrent.exception import TriggerDataException,NoSpaceLeftException
 class Manager:
     def __init__(self, download_path, callback=None) -> None:
         self.ses = lt.session()
-        settings = lt.default_settings()
-        settings["alert_mask"] = settings["alert_mask"] | lt.alert.category_t.status_notification | lt.alert.category_t.progress_notification
-        settings["listen_interfaces"] = "0.0.0.0:5550,[::]:5550"
-        settings["upload_rate_limit"] = 0
-        settings["download_rate_limit"] = 0
+        self.settings = lt.default_settings()
+        self.settings["alert_mask"] = self.settings["alert_mask"] | lt.alert.category_t.status_notification | lt.alert.category_t.progress_notification
+        self.settings["listen_interfaces"] = "0.0.0.0:5550,[::]:5550"
+        self.settings["upload_rate_limit"] = 0
+        self.settings["download_rate_limit"] = 1000000
 
-        self.ses.apply_settings(settings)
+        self.ses.apply_settings(self.settings)
 
         self.download_path = download_path
         self.fast_resume_path = os.path.join(download_path, ".fast_resume.json")
@@ -67,6 +67,9 @@ class Manager:
         for t in self.torrents:
             if hash == t.hash:
                 return t
+    
+    def get_settings(self):
+        return self.settings
     
     async def add_magnet(self, magnet):
         h = lt.add_magnet_uri(self.ses, magnet, {'save_path': self.download_path,
@@ -144,6 +147,14 @@ class Manager:
         t = self.get(hash)
         t.reset_trigger(id)
         t.alert_save()
+    
+    def set_rate_limit(self, up, down):
+        if up is not None:
+            self.settings["upload_rate_limit"] = int(up)
+        if down is not None:
+            self.settings["download_rate_limit"] = int(down)
+        print(self.settings)
+        self.ses.apply_settings(self.settings)
     
     def set_position(self, hash, position):
         self.get(hash).set_position(position)

@@ -177,6 +177,22 @@ async def delete_torrent(request):
     manager.remove(hash)
     return web.json_response({"message": "ok"})
 
+async def session_settings(request):
+    return web.json_response(manager.get_settings())
+
+async def edit_session_settings(request):
+    data = await request.json()
+    if "rate_limit" in data:
+        if "up" not in data["rate_limit"] or "down" not in data["rate_limit"]:
+            return web.json_response(
+                data={"message": "up and down is needed for rate_limit"},
+                status=400
+            )
+        print(data)
+        manager.set_rate_limit(data["rate_limit"]["up"], data["rate_limit"]["down"])
+
+    return web.json_response({"message": "ok"})
+
 async def search_movie(request):
     title=request.rel_url.query.get('title', None)
     year=request.rel_url.query.get('year', None)
@@ -292,6 +308,8 @@ app.add_routes([web.static('/css', static_path+'/css'),
                 web.post('/torrent', post_torrent),
                 web.put('/torrent', put_torrent),
                 web.delete('/torrent', delete_torrent),
+                web.get('/session', session_settings),
+                web.put('/session', edit_session_settings),
                 web.get('/tmdb/search/movie', search_movie),
                 web.get('/tmdb/search/tv', search_tv),
                 web.get('/tmdb/episode', check_episode),

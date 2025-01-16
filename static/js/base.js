@@ -50,6 +50,11 @@ $( document ).ready(function() {
         refresh_freespace();
     }, 10*60*1000);
 
+    refresh_session_setting();
+    window.setInterval(function(){
+        refresh_session_setting();
+    }, 10*60*1000);
+
     InitTorrentTable();
     InitModalEdit();
     InitModalUpload();
@@ -59,12 +64,53 @@ $( document ).ready(function() {
 
     $("#adding").on( "click", function(){$('#modal-upload').iziModal('open')});
 
+    $('#session_rate_limit_up').keypress(function (e) {
+        var key = e.which;
+        if(key == 13){
+            edit_setting_rate_limit()
+            return false;  
+        }
+    });
+
+    $('#session_rate_limit_down').keypress(function (e) {
+        var key = e.which;
+        if(key == 13){
+            edit_setting_rate_limit()
+            return false;  
+        }
+    });
+
     $('#search').on('input',function(e){
         torrent_table.setFilter("name", "keywords", $("#search").val(), {matchAll:true});
     });
 
     
 });
+
+function refresh_session_setting(){
+    axios.get('/session')
+    .then(function (response) {
+        $("#session_rate_limit_up").val(response.data.upload_rate_limit/1000000)
+        $("#session_rate_limit_down").val(response.data.download_rate_limit/1000000)
+    })
+    .catch(function (error) {
+        open_alert_error("session settings refresh: ", error);
+    })
+}
+
+function edit_setting_rate_limit(){
+    axios.put('/session',{rate_limit:{
+        up: parseInt($("#session_rate_limit_up").val())*1000000,
+        down: parseInt($("#session_rate_limit_down").val())*1000000,
+    }})
+    .then(function (response) {
+        refresh_session_setting()
+        console.log("session settings edited");
+    })
+    .catch(function (error) {
+        open_alert_error("session settings : ", error);
+    })
+}
 
 function refresh_freespace(){
     axios.get("/freespace")
