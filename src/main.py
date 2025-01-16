@@ -188,7 +188,6 @@ async def edit_session_settings(request):
                 data={"message": "up and down is needed for rate_limit"},
                 status=400
             )
-        print(data)
         manager.set_rate_limit(data["rate_limit"]["up"], data["rate_limit"]["down"])
 
     return web.json_response({"message": "ok"})

@@ -153,7 +153,6 @@ class Manager:
             self.settings["upload_rate_limit"] = int(up)
         if down is not None:
             self.settings["download_rate_limit"] = int(down)
-        print(self.settings)
         self.ses.apply_settings(self.settings)
     
     def set_position(self, hash, position):
