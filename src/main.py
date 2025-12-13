@@ -28,11 +28,11 @@ config = None
 args = arg_parser.parse_args()
 
 if args.config is None:
-    config = get_config("/etc/torrpy/config.toml")
+    config = get_config()
 else:
     config = get_config(args.config)
 if args.static is None:
-    static_path = "/usr/share/torrpy/static/"
+    static_path = "/static/"
 else:
     static_path = args.static
 

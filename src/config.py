@@ -3,7 +3,7 @@ from pathlib import Path
 
 import toml
 
-def get_config(config_path="/etc/torrpy/config.toml"):
+def get_config(config_path="/config.toml"):
     if os.path.isfile(config_path):
         config = toml.load(config_path)
         if set({"port",
