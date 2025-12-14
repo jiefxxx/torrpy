@@ -1,0 +1,34 @@
+body {
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+
+.tabulator-menu{
+    z-index: 99999999;
+}
+
+.vh-50 {
+    height: 50vh;
+}
+
+.vh-85 {
+    height: 85vh;
+}
+   
+.vh-90 {
+    height: 90vh;
+}
+
+.vh-10 {
+    height: 10vh;
+}
+
+.test-back {
+    background: blue; 
+}
+
+.overflow-x-hidden {
+    overflow-x: hidden;
+}
+
+
+  
