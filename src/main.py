@@ -284,11 +284,13 @@ async def free_space(request):
     movie_free = 0
     for path in config["movie_folders"]:
         _,_,free = shutil.disk_usage(path)
+        print(path,free)
         movie_free += free
 
     tv_free = 0
     for path in config["tv_folders"]:
         _,_,free = shutil.disk_usage(path)
+        print(path,free)
         tv_free += free
     
     return web.json_response({
