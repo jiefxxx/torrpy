@@ -16,8 +16,6 @@ RUN pip install --upgrade pip \
 COPY src /src
 COPY static /static
 
-RUN chown -R appuser:appuser /src /static
-
 EXPOSE 8042
 expose 5550
 
