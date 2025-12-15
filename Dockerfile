@@ -8,9 +8,6 @@ ENV PYTHONUNBUFFERED=1
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Créer un utilisateur non-root
-RUN useradd -m appuser
-
 COPY requirements.txt ./
 
 RUN pip install --upgrade pip \
@@ -20,8 +17,6 @@ COPY src /src
 COPY static /static
 
 RUN chown -R appuser:appuser /src /static
-
-USER appuser
 
 EXPOSE 8042
 expose 5550
