@@ -36,6 +36,10 @@ if args.static is None:
 else:
     static_path = args.static
 
+def get_statvfs(path):
+    statvfs = os.statvfs(path)
+    return statvfs.f_frsize * statvfs.f_blocks
+
 def format_title(title):
     title = title.lower()
     title = title.replace("*", "")
@@ -91,7 +95,7 @@ def callback(path, data):
 
 def get_folder_by_size(size, folders):
     for folder in folders:
-        _, _, free = shutil.disk_usage(folder)
+        free = get_statvfs(folder)
         if size < free:
             return folder
     raise NoSpaceLeftException("no folders or free space")
@@ -279,19 +283,18 @@ async def parse(request):
     )
 
 async def free_space(request):
-    _,_,download_free = shutil.disk_usage(config["download_path"])
+    download_free = get_statvfs(config["download_path"])
 
-    movie_free = 0
+    movie_free = {}
     for path in config["movie_folders"]:
-        _,_,free = shutil.disk_usage(path)
-        print(path,free)
-        movie_free += free
+        free = get_statvfs(path)
+        movie_free[path] = free
 
-    tv_free = 0
+
+    tv_free = {}
     for path in config["tv_folders"]:
-        _,_,free = shutil.disk_usage(path)
-        print(path,free)
-        tv_free += free
+        free = get_statvfs(path)
+        tv_free[path] = free
     
     return web.json_response({
         "movie": movie_free,
